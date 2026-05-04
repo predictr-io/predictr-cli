@@ -38,3 +38,13 @@ where = ["src"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-v"
+
+[tool.pylint.messages_control]
+disable = [
+    "duplicate-code",
+    "import-outside-toplevel",
+    "missing-function-docstring",
+    "too-many-arguments",
+    "too-many-instance-attributes",
+    "too-many-positional-arguments",
+]

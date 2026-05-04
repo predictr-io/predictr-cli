@@ -207,7 +207,7 @@ def tables(
 def columns(
     ctx: typer.Context,
     conn_id: str = typer.Argument(..., help="Connection id"),
-    table: str = typer.Option(..., "--table", "-t", help="Table name"),
+    table_name: str = typer.Option(..., "--table", "-t", help="Table name"),
 ) -> None:
     """List columns for a table on this connection."""
     cfg = ctx.obj
@@ -215,7 +215,7 @@ def columns(
     with make_client(cfg) as client:
         result = client.get(
             f"/{org}/connections/{conn_id}/columns",
-            params={"table": table},
+            params={"table": table_name},
         )
     emit(result, cfg.output_format, quiet=cfg.quiet)
 

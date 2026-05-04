@@ -1,0 +1,15 @@
+image: python:3.12
+
+pipelines:
+  branches:
+    main:
+      - step:
+          name: Lint, Type Check, and Test
+          caches:
+            - pip
+          script:
+            - pip install uv
+            - uv pip install ".[dev]" --system
+            - python -m pylint src/pebbles/*.py src/pebbles/commands/*.py
+            - python -m mypy src/pebbles
+            - python -m pytest
