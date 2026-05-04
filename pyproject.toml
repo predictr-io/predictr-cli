@@ -1,0 +1,40 @@
+[project]
+name = "predictr-cli"
+version = "0.1.0"
+description = "Command-line interface for the predictr.io API"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+authors = [{ name = "predictr.io" }]
+dependencies = [
+    "typer>=0.12",
+    "httpx>=0.27",
+    "tenacity>=8.2",
+    "rich>=13.7",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-mock>=3.12",
+    "respx>=0.21",
+    "pylint>=3.2",
+    "mypy>=1.10",
+    "types-PyYAML",
+]
+
+[project.scripts]
+predictr-cli = "pebbles.cli:main"
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"
