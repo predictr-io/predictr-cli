@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import typer
 
-from pebbles.client import make_client
-from pebbles.output import emit
+from predictr_cli.client import make_client
+from predictr_cli.output import emit
 
 app = typer.Typer(no_args_is_help=True, help="Server meta info & schemas.")
 

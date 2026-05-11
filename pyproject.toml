@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Command-line interface for the predictr.io API"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Proprietary" }
+license = { text = "MIT" }
 authors = [{ name = "predictr.io" }]
 dependencies = [
     "typer>=0.12",
@@ -25,7 +25,7 @@ dev = [
 ]
 
 [project.scripts]
-predictr-cli = "pebbles.cli:main"
+predictr-cli = "predictr_cli.cli:main"
 
 [build-system]
 requires = ["setuptools>=64", "wheel"]

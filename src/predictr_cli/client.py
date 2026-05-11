@@ -14,7 +14,7 @@ from tenacity import (
     wait_exponential,
 )
 
-from pebbles.config import Config, ConfigError
+from predictr_cli.config import Config, ConfigError
 
 
 class APIError(Exception):

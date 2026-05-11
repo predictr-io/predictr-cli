@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from pebbles.config import (
+from predictr_cli.config import (
     DEFAULT_API_URL,
     DEFAULT_MAX_RETRIES,
     Config,
@@ -21,7 +21,7 @@ def test_defaults_apply_when_nothing_set(monkeypatch):
     monkeypatch.delenv("PREDICTR_MAX_RETRIES", raising=False)
     monkeypatch.delenv("PREDICTR_OUTPUT", raising=False)
     # Bypass any user config file the test machine happens to have.
-    monkeypatch.setattr("pebbles.config._load_file_config", lambda: {})
+    monkeypatch.setattr("predictr_cli.config._load_file_config", lambda: {})
 
     cfg = resolve_config()
 
@@ -33,7 +33,7 @@ def test_defaults_apply_when_nothing_set(monkeypatch):
 
 
 def test_env_var_used_when_flag_missing(monkeypatch):
-    monkeypatch.setattr("pebbles.config._load_file_config", lambda: {})
+    monkeypatch.setattr("predictr_cli.config._load_file_config", lambda: {})
     monkeypatch.setenv("PREDICTR_API_KEY", "from-env")
     monkeypatch.setenv("PREDICTR_ORG", "acme")
 
@@ -44,7 +44,7 @@ def test_env_var_used_when_flag_missing(monkeypatch):
 
 
 def test_flag_beats_env_var(monkeypatch):
-    monkeypatch.setattr("pebbles.config._load_file_config", lambda: {})
+    monkeypatch.setattr("predictr_cli.config._load_file_config", lambda: {})
     monkeypatch.setenv("PREDICTR_API_KEY", "from-env")
     monkeypatch.setenv("PREDICTR_ORG", "from-env-org")
 
@@ -56,7 +56,7 @@ def test_flag_beats_env_var(monkeypatch):
 
 def test_env_beats_config_file(monkeypatch):
     monkeypatch.setattr(
-        "pebbles.config._load_file_config",
+        "predictr_cli.config._load_file_config",
         lambda: {"api_key": "from-file", "org_name": "from-file-org"},
     )
     monkeypatch.setenv("PREDICTR_API_KEY", "from-env")

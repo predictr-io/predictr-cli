@@ -11,9 +11,9 @@ from typing import Optional
 
 import typer
 
-from pebbles import __version__
-from pebbles.client import APIError
-from pebbles.commands import (
+from predictr_cli import __version__
+from predictr_cli.client import APIError
+from predictr_cli.commands import (
     connections,
     datasets,
     mba,
@@ -23,8 +23,8 @@ from pebbles.commands import (
     salesforecast,
     workflows,
 )
-from pebbles.config import ConfigError, resolve_config
-from pebbles.output import emit_error
+from predictr_cli.config import ConfigError, resolve_config
+from predictr_cli.output import emit_error
 
 app = typer.Typer(
     name="predictr-cli",
@@ -128,8 +128,8 @@ app.add_typer(salesforecast.app, name="salesforecast", help="Sales forecasting a
 @app.command()
 def capabilities(ctx: typer.Context) -> None:
     """Show capabilities (plan, limits, trial days remaining) for the current org."""
-    from pebbles.client import make_client
-    from pebbles.output import emit
+    from predictr_cli.client import make_client
+    from predictr_cli.output import emit
 
     cfg = ctx.obj
     org = cfg.require_org()
@@ -141,8 +141,8 @@ def capabilities(ctx: typer.Context) -> None:
 @app.command()
 def analyses(ctx: typer.Context) -> None:
     """List ALL analyses across all slates (mba/rfm/salesforecast) for the current org."""
-    from pebbles.client import make_client
-    from pebbles.output import emit
+    from predictr_cli.client import make_client
+    from predictr_cli.output import emit
 
     cfg = ctx.obj
     org = cfg.require_org()

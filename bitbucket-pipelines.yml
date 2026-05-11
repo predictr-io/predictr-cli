@@ -10,6 +10,6 @@ pipelines:
           script:
             - pip install uv
             - uv pip install ".[dev]" --system
-            - python -m pylint src/pebbles/*.py src/pebbles/commands/*.py
-            - python -m mypy src/pebbles
+            - python -m pylint src/predictr_cli/*.py src/predictr_cli/commands/*.py
+            - python -m mypy src/predictr_cli
             - python -m pytest

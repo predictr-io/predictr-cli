@@ -7,9 +7,9 @@ from typing import Any, Optional
 
 import typer
 
-from pebbles.client import Client
-from pebbles.config import Config
-from pebbles.output import emit
+from predictr_cli.client import Client
+from predictr_cli.config import Config
+from predictr_cli.output import emit
 
 # Reusable pagination flags. Use these in a list command's signature so all
 # list commands have a consistent UX around paging.

@@ -7,10 +7,10 @@ from typing import Optional
 
 import typer
 
-from pebbles.client import make_client
-from pebbles.commands._helpers import ALL_PAGES_OPT, PAGE_TOKEN_OPT, emit_list
-from pebbles.input import read_json_input
-from pebbles.output import emit
+from predictr_cli.client import make_client
+from predictr_cli.commands._helpers import ALL_PAGES_OPT, PAGE_TOKEN_OPT, emit_list
+from predictr_cli.input import read_json_input
+from predictr_cli.output import emit
 
 app = typer.Typer(no_args_is_help=True, help="Manage data-mining models.")
 

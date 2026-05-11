@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import typer
 
-from pebbles.input import read_json_input
+from predictr_cli.input import read_json_input
 
 
 def test_read_from_file(tmp_path: Path):

@@ -6,8 +6,8 @@ import httpx
 import pytest
 import respx
 
-from pebbles.client import APIError, Client
-from pebbles.config import Config
+from predictr_cli.client import APIError, Client
+from predictr_cli.config import Config
 
 
 def _config(**overrides) -> Config:
