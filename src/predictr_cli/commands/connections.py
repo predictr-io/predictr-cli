@@ -8,7 +8,13 @@ from typing import Optional
 import typer
 
 from predictr_cli.client import make_client
-from predictr_cli.commands._helpers import ALL_PAGES_OPT, PAGE_TOKEN_OPT, emit_list
+from predictr_cli.commands._helpers import (
+    ALL_PAGES_OPT,
+    OUTPUT_OPT,
+    PAGE_TOKEN_OPT,
+    emit_list,
+    resolve_output,
+)
 from predictr_cli.input import read_json_input
 from predictr_cli.output import emit
 
@@ -35,6 +41,7 @@ def list_(
     ctx: typer.Context,
     page_token: Optional[str] = PAGE_TOKEN_OPT,
     all_pages: bool = ALL_PAGES_OPT,
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """List all connections (`GET /<org>/connections`)."""
     cfg = ctx.obj
@@ -46,17 +53,22 @@ def list_(
             cfg=cfg,
             all_pages=all_pages,
             page_token=page_token,
+            output_override=output,
         )
 
 
 @app.command()
-def get(ctx: typer.Context, conn_id: str = typer.Argument(..., help="Connection id")) -> None:
+def get(
+    ctx: typer.Context,
+    conn_id: str = typer.Argument(..., help="Connection id"),
+    output: Optional[str] = OUTPUT_OPT,
+) -> None:
     """Get a single connection."""
     cfg = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/connections/{conn_id}")
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command()
@@ -64,6 +76,7 @@ def create(
     ctx: typer.Context,
     input_file: Optional[Path] = _INPUT_FILE_OPT,
     data: Optional[str] = _DATA_OPT,
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Create a new connection from a JSON document."""
     cfg = ctx.obj
@@ -71,7 +84,7 @@ def create(
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
         result = client.post(f"/{org}/connections", json=payload)
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command()
@@ -80,6 +93,7 @@ def update(
     conn_id: str = typer.Argument(..., help="Connection id"),
     input_file: Optional[Path] = _INPUT_FILE_OPT,
     data: Optional[str] = _DATA_OPT,
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Update an existing connection (PATCH semantics)."""
     cfg = ctx.obj
@@ -87,33 +101,35 @@ def update(
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
         result = client.patch(f"/{org}/connections/{conn_id}", json=payload)
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command()
 def delete(
     ctx: typer.Context,
     conn_id: str = typer.Argument(..., help="Connection id"),
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Delete a connection."""
     cfg = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.delete(f"/{org}/connections/{conn_id}")
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command()
 def test(
     ctx: typer.Context,
     conn_id: str = typer.Argument(..., help="Connection id"),
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Test an existing connection (`GET /<org>/connections/<id>/test`)."""
     cfg = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/connections/{conn_id}/test")
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command("test-config")
@@ -121,6 +137,7 @@ def test_config(
     ctx: typer.Context,
     input_file: Optional[Path] = _INPUT_FILE_OPT,
     data: Optional[str] = _DATA_OPT,
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Test a connection config without saving it (`POST /<org>/connections/test`)."""
     cfg = ctx.obj
@@ -128,20 +145,21 @@ def test_config(
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
         result = client.post(f"/{org}/connections/test", json=payload)
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command()
 def crawl(
     ctx: typer.Context,
     conn_id: str = typer.Argument(..., help="Connection id"),
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Trigger a crawl to refresh table/column metadata."""
     cfg = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.post(f"/{org}/connections/{conn_id}/crawl")
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command()
@@ -162,6 +180,7 @@ def upload(
         "--total-parts",
         help="Total number of parts. Default 1 (single-part upload).",
     ),
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Upload a data file (CSV) to a fileupload connection.
 
@@ -187,20 +206,21 @@ def upload(
                 "total_parts": str(total_parts),
             },
         )
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command()
 def tables(
     ctx: typer.Context,
     conn_id: str = typer.Argument(..., help="Connection id"),
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """List tables discovered on this connection."""
     cfg = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/connections/{conn_id}/tables")
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command()
@@ -208,16 +228,20 @@ def columns(
     ctx: typer.Context,
     conn_id: str = typer.Argument(..., help="Connection id"),
     table_name: str = typer.Option(..., "--table", "-t", help="Table name"),
+    schema: str = typer.Option(..., "--schema", "-s", help="Schema name."),
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """List columns for a table on this connection."""
     cfg = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
+        # `schema_name` is the canonical parameter name; mr-slate also accepts
+        # the older `schema` for backward compat (see mr-slate app_connections).
         result = client.get(
             f"/{org}/connections/{conn_id}/columns",
-            params={"table": table_name},
+            params={"table": table_name, "schema_name": schema},
         )
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command("table")
@@ -226,6 +250,7 @@ def table(
     conn_id: str = typer.Argument(..., help="Connection id"),
     table_name: str = typer.Argument(..., help="Table name"),
     schema: str = typer.Option(..., "--schema", "-s", help="Schema name."),
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Get a table's column definitions plus a row sample (combined endpoint)."""
     cfg = ctx.obj
@@ -233,9 +258,9 @@ def table(
     with make_client(cfg) as client:
         result = client.get(
             f"/{org}/connections/{conn_id}/tables/{table_name}",
-            params={"schema": schema},
+            params={"schema_name": schema},
         )
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)
 
 
 @app.command("table-sample")
@@ -244,6 +269,7 @@ def table_sample(
     conn_id: str = typer.Argument(..., help="Connection id"),
     table_name: str = typer.Argument(..., help="Table name"),
     schema: str = typer.Option(..., "--schema", "-s", help="Schema name."),
+    output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Get a row sample as key-value pairs (column name → value)."""
     cfg = ctx.obj
@@ -251,6 +277,6 @@ def table_sample(
     with make_client(cfg) as client:
         result = client.get(
             f"/{org}/connections/{conn_id}/tables/{table_name}/sample",
-            params={"schema": schema},
+            params={"schema_name": schema},
         )
-    emit(result, cfg.output_format, quiet=cfg.quiet)
+    emit(result, resolve_output(cfg, output), quiet=cfg.quiet)

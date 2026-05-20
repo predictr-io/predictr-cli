@@ -84,3 +84,87 @@ def test_connections_create_with_no_input_errors(monkeypatch):
     monkeypatch.setattr("predictr_cli.config._load_file_config", lambda: {})
     result = runner.invoke(app, ["connections", "create"])
     assert result.exit_code != 0
+
+
+# --------------------------------------------------------------------------- #
+# Per-leaf `--output/-o` works on the right of the subcommand (regression).
+# --------------------------------------------------------------------------- #
+@respx.mock
+def test_connections_list_accepts_output_flag_on_the_leaf(monkeypatch):
+    """Regression: `connections list --output yaml` must work, not only the
+    pre-subcommand `-o yaml connections list`."""
+    monkeypatch.setenv("PREDICTR_API_KEY", "fake")
+    monkeypatch.setenv("PREDICTR_ORG", "acme")
+    monkeypatch.setattr("predictr_cli.config._load_file_config", lambda: {})
+    respx.get("https://api.predictr.io/acme/connections").mock(
+        return_value=httpx.Response(200, json=[{"id": "c1", "name": "snowflake-prod"}])
+    )
+    result = runner.invoke(app, ["connections", "list", "--output", "yaml"])
+    assert result.exit_code == 0
+    # YAML output uses block-style "key: value" rather than JSON's {"key": "value"}.
+    assert "name: snowflake-prod" in result.stdout
+    # And short form too:
+    result = runner.invoke(app, ["connections", "list", "-o", "yaml"])
+    assert result.exit_code == 0
+    assert "name: snowflake-prod" in result.stdout
+
+
+# --------------------------------------------------------------------------- #
+# Schema parameter is sent as `schema_name` (the canonical name; mr-slate also
+# accepts plain `schema` for backward compat) and `columns` finally has a
+# --schema flag.
+# --------------------------------------------------------------------------- #
+@respx.mock
+def test_columns_sends_table_and_schema_name(monkeypatch):
+    """Regression: `connections columns -t T -s main` sends both table AND
+    schema_name (the schema flag was missing entirely before this fix)."""
+    monkeypatch.setenv("PREDICTR_API_KEY", "fake")
+    monkeypatch.setenv("PREDICTR_ORG", "acme")
+    monkeypatch.setattr("predictr_cli.config._load_file_config", lambda: {})
+    route = respx.get("https://api.predictr.io/acme/connections/c1/columns").mock(
+        return_value=httpx.Response(200, json=[])
+    )
+    result = runner.invoke(
+        app, ["connections", "columns", "c1", "-t", "test_table", "-s", "main"]
+    )
+    assert result.exit_code == 0, result.output
+    # Inspect the actual outbound query string so we catch wrong param names.
+    req = route.calls.last.request
+    assert req.url.params["table"] == "test_table"
+    assert req.url.params["schema_name"] == "main"
+
+
+@respx.mock
+def test_table_sample_sends_schema_name_not_schema(monkeypatch):
+    """Regression: `connections table-sample` previously sent `schema=` to an
+    endpoint that wanted `schema_name=`, returning 422. Verify canonical name."""
+    monkeypatch.setenv("PREDICTR_API_KEY", "fake")
+    monkeypatch.setenv("PREDICTR_ORG", "acme")
+    monkeypatch.setattr("predictr_cli.config._load_file_config", lambda: {})
+    route = respx.get(
+        "https://api.predictr.io/acme/connections/c1/tables/test_table/sample"
+    ).mock(return_value=httpx.Response(200, json=[]))
+    result = runner.invoke(
+        app, ["connections", "table-sample", "c1", "test_table", "-s", "main"]
+    )
+    assert result.exit_code == 0, result.output
+    assert route.calls.last.request.url.params["schema_name"] == "main"
+    assert "schema" not in [
+        k for k in route.calls.last.request.url.params.keys() if k != "schema_name"
+    ]
+
+
+@respx.mock
+def test_table_sends_schema_name(monkeypatch):
+    """The combined /tables/<t> endpoint also gets `schema_name=` for consistency."""
+    monkeypatch.setenv("PREDICTR_API_KEY", "fake")
+    monkeypatch.setenv("PREDICTR_ORG", "acme")
+    monkeypatch.setattr("predictr_cli.config._load_file_config", lambda: {})
+    route = respx.get(
+        "https://api.predictr.io/acme/connections/c1/tables/test_table"
+    ).mock(return_value=httpx.Response(200, json={"columns": [], "rows": []}))
+    result = runner.invoke(
+        app, ["connections", "table", "c1", "test_table", "-s", "main"]
+    )
+    assert result.exit_code == 0, result.output
+    assert route.calls.last.request.url.params["schema_name"] == "main"
