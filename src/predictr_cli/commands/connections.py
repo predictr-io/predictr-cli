@@ -15,6 +15,7 @@ from predictr_cli.commands._helpers import (
     emit_list,
     resolve_output,
 )
+from predictr_cli.config import Config
 from predictr_cli.input import read_json_input
 from predictr_cli.output import emit
 
@@ -44,7 +45,7 @@ def list_(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """List all connections (`GET /<org>/connections`)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         emit_list(
@@ -64,7 +65,7 @@ def get(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Get a single connection."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/connections/{conn_id}")
@@ -79,7 +80,7 @@ def create(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Create a new connection from a JSON document."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -96,7 +97,7 @@ def update(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Update an existing connection (PATCH semantics)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -111,7 +112,7 @@ def delete(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Delete a connection."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.delete(f"/{org}/connections/{conn_id}")
@@ -125,7 +126,7 @@ def test(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Test an existing connection (`GET /<org>/connections/<id>/test`)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/connections/{conn_id}/test")
@@ -140,7 +141,7 @@ def test_config(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Test a connection config without saving it (`POST /<org>/connections/test`)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -155,7 +156,7 @@ def crawl(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Trigger a crawl to refresh table/column metadata."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.post(f"/{org}/connections/{conn_id}/crawl")
@@ -188,7 +189,7 @@ def upload(
     command once per part with --part-number 1..N and --total-parts N.
     The server stitches them together when the final part arrives.
     """
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     if not file.exists():
         raise typer.BadParameter(f"File not found: {file}")
@@ -216,7 +217,7 @@ def tables(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """List tables discovered on this connection."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/connections/{conn_id}/tables")
@@ -232,7 +233,7 @@ def columns(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """List columns for a table on this connection."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         # `schema_name` is the canonical parameter name; mr-slate also accepts
@@ -253,7 +254,7 @@ def table(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Get a table's column definitions plus a row sample (combined endpoint)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(
@@ -272,7 +273,7 @@ def table_sample(
     output: Optional[str] = OUTPUT_OPT,
 ) -> None:
     """Get a row sample as key-value pairs (column name → value)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(

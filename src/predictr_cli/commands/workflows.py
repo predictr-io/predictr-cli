@@ -9,6 +9,7 @@ import typer
 
 from predictr_cli.client import make_client
 from predictr_cli.commands._helpers import ALL_PAGES_OPT, PAGE_TOKEN_OPT, emit_list
+from predictr_cli.config import Config
 from predictr_cli.input import read_json_input
 from predictr_cli.output import emit
 
@@ -29,7 +30,7 @@ def list_(
     all_pages: bool = ALL_PAGES_OPT,
 ) -> None:
     """List all workflows."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         emit_list(
@@ -47,7 +48,7 @@ def get(
     workflow_id: str = typer.Argument(..., help="Workflow id"),
 ) -> None:
     """Get a single workflow."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/workflow/{workflow_id}")
@@ -61,7 +62,7 @@ def create(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Create a new workflow from a JSON document."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -77,7 +78,7 @@ def update(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Update a workflow (PATCH semantics)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -91,7 +92,7 @@ def delete(
     workflow_id: str = typer.Argument(..., help="Workflow id"),
 ) -> None:
     """Delete a workflow."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.delete(f"/{org}/workflow/{workflow_id}")
@@ -104,7 +105,7 @@ def run(
     workflow_id: str = typer.Argument(..., help="Workflow id"),
 ) -> None:
     """Trigger a one-off run of the workflow."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.post(f"/{org}/workflow/{workflow_id}/run")
@@ -118,7 +119,7 @@ def history(
     run_id: Optional[str] = typer.Argument(None, help="Specific run id (optional)"),
 ) -> None:
     """Show run history for a workflow, or details of a single run."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     path = f"/{org}/workflow/{workflow_id}/history"
     if run_id:
@@ -136,7 +137,7 @@ def schedule(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Schedule a workflow (cron-style; pass schedule JSON via --input-file or --data)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -150,7 +151,7 @@ def unschedule(
     workflow_id: str = typer.Argument(..., help="Workflow id"),
 ) -> None:
     """Remove the schedule from a workflow."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.post(f"/{org}/workflow/{workflow_id}/unschedule")
@@ -160,7 +161,7 @@ def unschedule(
 @app.command()
 def zoneinfo(ctx: typer.Context) -> None:
     """List supported timezone strings (useful when defining schedules)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/workflow/zoneinfo")

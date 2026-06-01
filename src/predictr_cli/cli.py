@@ -23,7 +23,7 @@ from predictr_cli.commands import (
     salesforecast,
     workflows,
 )
-from predictr_cli.config import ConfigError, resolve_config
+from predictr_cli.config import Config, ConfigError, resolve_config
 from predictr_cli.output import emit_error
 
 app = typer.Typer(
@@ -131,7 +131,7 @@ def capabilities(ctx: typer.Context) -> None:
     from predictr_cli.client import make_client
     from predictr_cli.output import emit
 
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/capabilities")
@@ -144,7 +144,7 @@ def analyses(ctx: typer.Context) -> None:
     from predictr_cli.client import make_client
     from predictr_cli.output import emit
 
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/analysis")

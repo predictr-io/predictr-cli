@@ -9,6 +9,7 @@ import typer
 
 from predictr_cli.client import make_client
 from predictr_cli.commands._helpers import ALL_PAGES_OPT, PAGE_TOKEN_OPT, emit_list
+from predictr_cli.config import Config
 from predictr_cli.input import read_json_input
 from predictr_cli.output import emit
 
@@ -29,7 +30,7 @@ def list_(
     all_pages: bool = ALL_PAGES_OPT,
 ) -> None:
     """List all datasets (`GET /<org>/datasets`)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         emit_list(
@@ -47,7 +48,7 @@ def get(
     dataset_id: str = typer.Argument(..., help="Dataset id"),
 ) -> None:
     """Get a single dataset."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/datasets/{dataset_id}")
@@ -61,7 +62,7 @@ def create(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Create a new dataset from a JSON document."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -77,7 +78,7 @@ def update(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Update an existing dataset."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -91,7 +92,7 @@ def delete(
     dataset_id: str = typer.Argument(..., help="Dataset id"),
 ) -> None:
     """Delete a dataset."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.delete(f"/{org}/datasets/{dataset_id}")
@@ -107,7 +108,7 @@ def sample(
     ),
 ) -> None:
     """Fetch a small data sample for the dataset."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     params = {"feature": feature} if feature else None
     with make_client(cfg) as client:
@@ -121,7 +122,7 @@ def analyze(
     dataset_id: str = typer.Argument(..., help="Dataset id"),
 ) -> None:
     """Run automatic analysis on the dataset."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/datasets/{dataset_id}/analyze")

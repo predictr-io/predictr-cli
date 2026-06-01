@@ -9,6 +9,7 @@ import typer
 
 from predictr_cli.client import make_client
 from predictr_cli.commands._helpers import ALL_PAGES_OPT, PAGE_TOKEN_OPT, emit_list
+from predictr_cli.config import Config
 from predictr_cli.input import read_json_input
 from predictr_cli.output import emit
 
@@ -29,7 +30,7 @@ def list_(
     all_pages: bool = ALL_PAGES_OPT,
 ) -> None:
     """List all models."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         emit_list(
@@ -47,7 +48,7 @@ def get(
     model_id: str = typer.Argument(..., help="Model id"),
 ) -> None:
     """Get a single model."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.get(f"/{org}/models/{model_id}")
@@ -71,7 +72,7 @@ def create(
     ),
 ) -> None:
     """Create a new model from a JSON document."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     params: dict[str, str] = {"fit_now": "true" if fit_now else "false"}
@@ -93,7 +94,7 @@ def update(
     ),
 ) -> None:
     """Update an existing model. Defaults to PUT (replace); pass --patch for PATCH."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -110,7 +111,7 @@ def delete(
     model_id: str = typer.Argument(..., help="Model id"),
 ) -> None:
     """Delete a model."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         result = client.delete(f"/{org}/models/{model_id}")
@@ -125,7 +126,7 @@ def predict(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Run a prediction with the given input payload."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:

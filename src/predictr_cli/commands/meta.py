@@ -9,6 +9,7 @@ from __future__ import annotations
 import typer
 
 from predictr_cli.client import make_client
+from predictr_cli.config import Config
 from predictr_cli.output import emit
 
 app = typer.Typer(no_args_is_help=True, help="Server meta info & schemas.")
@@ -17,7 +18,7 @@ app = typer.Typer(no_args_is_help=True, help="Server meta info & schemas.")
 @app.command()
 def info(ctx: typer.Context) -> None:
     """Show backend version and meta info (`GET /meta`)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     with make_client(cfg) as client:
         result = client.get("/meta")
     emit(result, cfg.output_format, quiet=cfg.quiet)
@@ -26,7 +27,7 @@ def info(ctx: typer.Context) -> None:
 @app.command()
 def transformations(ctx: typer.Context) -> None:
     """List available dataset transformations (`GET /meta/transformations`)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     with make_client(cfg) as client:
         result = client.get("/meta/transformations")
     emit(result, cfg.output_format, quiet=cfg.quiet)
@@ -35,7 +36,7 @@ def transformations(ctx: typer.Context) -> None:
 @app.command("schema-model")
 def schema_model(ctx: typer.Context) -> None:
     """Show the JSON Schema for the model resource."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     with make_client(cfg) as client:
         result = client.get("/meta/schema/model")
     emit(result, cfg.output_format, quiet=cfg.quiet)
@@ -44,7 +45,7 @@ def schema_model(ctx: typer.Context) -> None:
 @app.command("schema-dataset")
 def schema_dataset(ctx: typer.Context) -> None:
     """Show the JSON Schema for the dataset resource."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     with make_client(cfg) as client:
         result = client.get("/meta/schema/dataset")
     emit(result, cfg.output_format, quiet=cfg.quiet)

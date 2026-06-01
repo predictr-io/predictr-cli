@@ -9,6 +9,7 @@ import typer
 
 from predictr_cli.client import make_client
 from predictr_cli.commands._helpers import ALL_PAGES_OPT, PAGE_TOKEN_OPT, emit_list
+from predictr_cli.config import Config
 from predictr_cli.input import read_json_input
 from predictr_cli.output import emit
 
@@ -31,7 +32,7 @@ def list_(
     all_pages: bool = ALL_PAGES_OPT,
 ) -> None:
     """List all RFM analyses."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         emit_list(
@@ -52,7 +53,7 @@ def get(
     ),
 ) -> None:
     """Get a single RFM analysis."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     params = {"ml_model_id": ml_model_id} if ml_model_id else None
     with make_client(cfg) as client:
@@ -72,7 +73,7 @@ def create(
     ),
 ) -> None:
     """Create a new RFM analysis."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     params = {"model_build_infra": model_build_infra} if model_build_infra else None
@@ -89,7 +90,7 @@ def update(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Update an RFM analysis (PATCH)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -108,7 +109,7 @@ def delete(
     ),
 ) -> None:
     """Delete an RFM analysis, or one of its fit models with --model-id."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     if model_id:
         path = f"/{org}{_PREFIX}/{analysis_id}/models/{model_id}"
@@ -132,7 +133,7 @@ def fit(
     ),
 ) -> None:
     """Fit (train) the RFM analysis."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data, required=False) or {}
     params = {"model_build_infra": model_build_infra} if model_build_infra else None
@@ -156,7 +157,7 @@ def set_active_model(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Promote a fit run to be the active model for an RFM analysis."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     if model_id:
         if input_file or data:
@@ -187,7 +188,7 @@ def predict(
     ),
 ) -> None:
     """Run an RFM prediction for given Recency / Frequency / Monetary values."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     params: dict[str, str] = {"R": str(r), "F": str(f), "M": str(m)}
     if ml_model_id:
@@ -207,7 +208,7 @@ def guess_schema(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Ask the server to guess an RFM schema for a given connection's data."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data, required=False) or {}
     params: dict[str, str] = {}

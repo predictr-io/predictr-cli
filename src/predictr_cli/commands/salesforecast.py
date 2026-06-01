@@ -9,6 +9,7 @@ import typer
 
 from predictr_cli.client import make_client
 from predictr_cli.commands._helpers import ALL_PAGES_OPT, PAGE_TOKEN_OPT, emit_list
+from predictr_cli.config import Config
 from predictr_cli.input import read_json_input
 from predictr_cli.output import emit
 
@@ -31,7 +32,7 @@ def list_(
     all_pages: bool = ALL_PAGES_OPT,
 ) -> None:
     """List all sales-forecast analyses."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
         emit_list(
@@ -52,7 +53,7 @@ def get(
     ),
 ) -> None:
     """Get a single sales-forecast analysis."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     params = {"ml_model_id": ml_model_id} if ml_model_id else None
     with make_client(cfg) as client:
@@ -77,7 +78,7 @@ def create(
     ),
 ) -> None:
     """Create a new sales-forecast analysis."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     params: dict[str, str] = {"fit_now": "true" if fit_now else "false"}
@@ -96,7 +97,7 @@ def update(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Update a sales-forecast analysis (PATCH)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
     with make_client(cfg) as client:
@@ -115,7 +116,7 @@ def delete(
     ),
 ) -> None:
     """Delete a sales-forecast analysis, or one of its fit models with --model-id."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     if model_id:
         path = f"/{org}{_PREFIX}/{analysis_id}/models/{model_id}"
@@ -139,7 +140,7 @@ def fit(
     ),
 ) -> None:
     """Fit (train) the sales-forecast analysis."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data, required=False) or {}
     params = {"model_build_infra": model_build_infra} if model_build_infra else None
@@ -163,7 +164,7 @@ def set_active_model(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Promote a fit run to be the active model."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     if model_id:
         if input_file or data:
@@ -200,7 +201,7 @@ def predict(
     ),
 ) -> None:
     """Run a sales forecast prediction."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     params: dict[str, str] = {
         "periods": str(periods),
@@ -224,7 +225,7 @@ def guess_schema(
     data: Optional[str] = _DATA_OPT,
 ) -> None:
     """Ask the server to guess a forecast schema for a given connection's data."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data, required=False) or {}
     params: dict[str, str] = {}
@@ -249,7 +250,7 @@ def holidays(
     ),
 ) -> None:
     """List supported holiday calendars (or holidays for a given country)."""
-    cfg = ctx.obj
+    cfg: Config = ctx.obj
     org = cfg.require_org()
     path = f"/{org}{_PREFIX}/holidays"
     if country_code:
