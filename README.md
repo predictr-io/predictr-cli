@@ -122,11 +122,11 @@ predictr-cli rfm fit <id>
 predictr-cli rfm guess-schema <conn-id>
 predictr-cli rfm delete <id> --model-id <model-id>        # delete one fit only
 
-predictr-cli salesforecast list
-predictr-cli salesforecast create --input-file sf.json
-predictr-cli salesforecast fit <id>
-predictr-cli salesforecast holidays                       # supported countries
-predictr-cli salesforecast holidays GB                    # holidays for GB
+predictr-cli forecast list
+predictr-cli forecast create --input-file sf.json
+predictr-cli forecast fit <id>
+predictr-cli forecast holidays                       # supported countries
+predictr-cli forecast holidays GB                    # holidays for GB
 ```
 
 ### Complex JSON input

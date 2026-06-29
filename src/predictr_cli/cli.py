@@ -20,7 +20,7 @@ from predictr_cli.commands import (
     meta,
     models,
     rfm,
-    salesforecast,
+    forecast,
     workflows,
 )
 from predictr_cli.config import Config, ConfigError, resolve_config
@@ -119,7 +119,7 @@ app.add_typer(models.app, name="models", help="Manage models and run predictions
 app.add_typer(workflows.app, name="workflows", help="Manage workflows (orchestration).")
 app.add_typer(mba.app, name="mba", help="Market Basket Analysis.")
 app.add_typer(rfm.app, name="rfm", help="RFM clustering analysis.")
-app.add_typer(salesforecast.app, name="salesforecast", help="Sales forecasting analysis.")
+app.add_typer(forecast.app, name="forecast", help="Forecasting analysis.")
 
 
 # --------------------------------------------------------------------------- #
@@ -140,7 +140,7 @@ def capabilities(ctx: typer.Context) -> None:
 
 @app.command()
 def analyses(ctx: typer.Context) -> None:
-    """List ALL analyses across all slates (mba/rfm/salesforecast) for the current org."""
+    """List ALL analyses across all slates (mba/rfm/forecast) for the current org."""
     from predictr_cli.client import make_client
     from predictr_cli.output import emit
 

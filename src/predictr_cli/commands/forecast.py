@@ -1,4 +1,4 @@
-"""Sales Forecasting analysis endpoints."""
+"""Forecasting analysis endpoints."""
 
 from __future__ import annotations
 
@@ -13,9 +13,9 @@ from predictr_cli.config import Config
 from predictr_cli.input import read_json_input
 from predictr_cli.output import emit
 
-app = typer.Typer(no_args_is_help=True, help="Sales forecasting analysis.")
+app = typer.Typer(no_args_is_help=True, help="Forecasting analysis.")
 
-_PREFIX = "/analysis/salesforecast"
+_PREFIX = "/analysis/forecast"
 
 _INPUT_FILE_OPT = typer.Option(
     None, "--input-file", "-f", help="Path to a JSON file (or '-' for stdin)."
@@ -31,7 +31,7 @@ def list_(
     page_token: Optional[str] = PAGE_TOKEN_OPT,
     all_pages: bool = ALL_PAGES_OPT,
 ) -> None:
-    """List all sales-forecast analyses."""
+    """List all forecast analyses."""
     cfg: Config = ctx.obj
     org = cfg.require_org()
     with make_client(cfg) as client:
@@ -47,12 +47,12 @@ def list_(
 @app.command()
 def get(
     ctx: typer.Context,
-    analysis_id: str = typer.Argument(..., help="Sales-forecast analysis id"),
+    analysis_id: str = typer.Argument(..., help="Forecast analysis id"),
     ml_model_id: Optional[str] = typer.Option(
         None, "--ml-model-id", help="Specific fit run (defaults to the active model)."
     ),
 ) -> None:
-    """Get a single sales-forecast analysis."""
+    """Get a single forecast analysis."""
     cfg: Config = ctx.obj
     org = cfg.require_org()
     params = {"ml_model_id": ml_model_id} if ml_model_id else None
@@ -77,7 +77,7 @@ def create(
         help="Container size (s/m/l/xl/xxl) or JSON backend spec for the fit job.",
     ),
 ) -> None:
-    """Create a new sales-forecast analysis."""
+    """Create a new forecast analysis."""
     cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
@@ -92,11 +92,11 @@ def create(
 @app.command()
 def update(
     ctx: typer.Context,
-    analysis_id: str = typer.Argument(..., help="Sales-forecast analysis id"),
+    analysis_id: str = typer.Argument(..., help="Forecast analysis id"),
     input_file: Optional[Path] = _INPUT_FILE_OPT,
     data: Optional[str] = _DATA_OPT,
 ) -> None:
-    """Update a sales-forecast analysis (PATCH)."""
+    """Update a forecast analysis (PATCH)."""
     cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data)
@@ -108,14 +108,14 @@ def update(
 @app.command()
 def delete(
     ctx: typer.Context,
-    analysis_id: str = typer.Argument(..., help="Sales-forecast analysis id"),
+    analysis_id: str = typer.Argument(..., help="Forecast analysis id"),
     model_id: Optional[str] = typer.Option(
         None,
         "--model-id",
         help="If set, delete only this fit model rather than the whole analysis.",
     ),
 ) -> None:
-    """Delete a sales-forecast analysis, or one of its fit models with --model-id."""
+    """Delete a forecast analysis, or one of its fit models with --model-id."""
     cfg: Config = ctx.obj
     org = cfg.require_org()
     if model_id:
@@ -130,7 +130,7 @@ def delete(
 @app.command()
 def fit(
     ctx: typer.Context,
-    analysis_id: str = typer.Argument(..., help="Sales-forecast analysis id"),
+    analysis_id: str = typer.Argument(..., help="Forecast analysis id"),
     input_file: Optional[Path] = _INPUT_FILE_OPT,
     data: Optional[str] = _DATA_OPT,
     model_build_infra: Optional[str] = typer.Option(
@@ -139,7 +139,7 @@ def fit(
         help="Container size (s/m/l/xl/xxl) or JSON backend spec for the fit job.",
     ),
 ) -> None:
-    """Fit (train) the sales-forecast analysis."""
+    """Fit (train) the forecast analysis."""
     cfg: Config = ctx.obj
     org = cfg.require_org()
     payload = read_json_input(input_file, data, required=False) or {}
@@ -154,7 +154,7 @@ def fit(
 @app.command("set-active-model")
 def set_active_model(
     ctx: typer.Context,
-    analysis_id: str = typer.Argument(..., help="Sales-forecast analysis id"),
+    analysis_id: str = typer.Argument(..., help="Forecast analysis id"),
     model_id: Optional[str] = typer.Option(
         None,
         "--model-id",
@@ -184,7 +184,7 @@ def set_active_model(
 @app.command()
 def predict(
     ctx: typer.Context,
-    analysis_id: str = typer.Argument(..., help="Sales-forecast analysis id"),
+    analysis_id: str = typer.Argument(..., help="Forecast analysis id"),
     periods: int = typer.Option(14, "--periods", "-p", help="Forecast periods. Default 14."),
     include_history: bool = typer.Option(
         True,
@@ -200,7 +200,7 @@ def predict(
         help="Specific fit run to predict against (defaults to the active model).",
     ),
 ) -> None:
-    """Run a sales forecast prediction."""
+    """Run a forecast prediction."""
     cfg: Config = ctx.obj
     org = cfg.require_org()
     params: dict[str, str] = {
